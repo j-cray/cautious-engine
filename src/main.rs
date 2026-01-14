@@ -109,16 +109,19 @@ fn cautious_scan(target: &str, port_range: &str, delay_ms: u64) {
         let addr = format!("{}:{}", target, port);
         
         // Attempt to connect with timeout
-        if let Ok(_stream) = TcpStream::connect_timeout(
-            &addr.parse().unwrap_or_else(|_| {
-                format!("127.0.0.1:{}", port).parse().unwrap()
-            }),
-            Duration::from_secs(1)
-        ) {
-            println!("  {} Port {} is {}", "✓".green(), port, "OPEN".bright_green());
-            open_ports.push(port);
-        } else {
-            print!(".");
+        match addr.parse::<std::net::SocketAddr>() {
+            Ok(socket_addr) => {
+                if TcpStream::connect_timeout(&socket_addr, Duration::from_secs(1)).is_ok() {
+                    println!("  {} Port {} is {}", "✓".green(), port, "OPEN".bright_green());
+                    open_ports.push(port);
+                } else {
+                    print!(".");
+                }
+            }
+            Err(_) => {
+                // Skip invalid addresses silently (likely hostname that needs resolution)
+                print!("?");
+            }
         }
         
         if port % 10 == 0 {
