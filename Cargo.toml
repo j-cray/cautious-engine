@@ -1,0 +1,16 @@
+[package]
+name = "cautious-engine"
+version = "2.0.0"
+edition = "2021"
+authors = ["Cautious Engine Contributors"]
+description = "A defensive security toolkit for ethical hackers and penetration testers"
+license = "MIT"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+colored = "2.1"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+base64 = "0.22"
+hex = "0.4"
