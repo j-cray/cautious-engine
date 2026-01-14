@@ -1,189 +1,281 @@
-# 🏰 cautious-engine
+# 🛡️ cautious-engine
 
-An **epic ASCII dungeon crawler** where one wrong step could be your last! Navigate treacherous dungeons filled with traps, enemies, and treasure. Being cautious isn't just recommended—it's **essential for survival**.
+A **defensive security toolkit** for ethical hackers and penetration testers. Built in Rust for performance, safety, and reliability.
 
-![Game Banner](https://img.shields.io/badge/Game-ASCII%20Dungeon%20Crawler-purple?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-Defensive%20Toolkit-red?style=for-the-badge)
+![Language](https://img.shields.io/badge/Language-Rust-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-![Platform](https://img.shields.io/badge/Platform-Terminal-blue?style=for-the-badge)
 
-## 🎮 What is cautious-engine?
+## 🎯 What is cautious-engine?
 
-**Cautious Engine** is an interactive terminal-based adventure game where you explore procedurally generated dungeons. Every move counts, every decision matters, and being cautious is the difference between victory and defeat!
+**Cautious Engine** is a defensive security toolkit designed to help ethical hackers and penetration testers operate *cautiously* and responsibly. It provides rate-limiting, stealth capabilities, and defensive mechanism detection to avoid triggering security systems and to conduct security assessments professionally.
 
-### 🌟 Features
+### 🌟 Key Features
 
-- **🎨 Beautiful ASCII Graphics** - Colorful terminal rendering with ANSI colors
-- **⚠️ Caution System** - Get proximity warnings when dangers are near
-- **💀 Deadly Traps** - Both visible and hidden traps await the unwary
-- **👾 Enemies** - Fight monsters lurking in the darkness
-- **💰 Treasures** - Collect coins scattered throughout the dungeon
-- **🏆 Scoring System** - Compete for the highest score based on coins, health, and efficiency
-- **🎲 Procedural Generation** - Every dungeon is unique
-- **⌨️ Smooth Controls** - Responsive WASD movement
+- **🐌 Rate-Limited Scanning** - Avoid detection by spacing out requests
+- **🛡️ Defense Detection** - Identify WAF, IDS/IPS, and other defensive mechanisms
+- **⏱️ Timing Controls** - Configurable delays to mimic legitimate traffic
+- **📊 Request Analysis** - Monitor success rates and blocking patterns
+- **🎓 Security Guidance** - Built-in best practices and responsible disclosure guidelines
+- **⚡ Rust Performance** - Fast, safe, and memory-efficient
+- **🎨 Beautiful CLI** - Colored output for clear visibility
 
-## 🚀 Quick Start
+## 🚀 Installation
+
+### Prerequisites
+- Rust 1.70 or higher
+- Cargo (comes with Rust)
+
+### Build from Source
 
 ```bash
-# Clone or download the repository
+# Clone the repository
+git clone https://github.com/j-cray/cautious-engine
 cd cautious-engine
 
-# Install (no dependencies needed!)
-npm install
+# Build the project
+cargo build --release
 
-# Play the game
-npm start
-
-# Or watch a demo
-npm run demo
+# Run the tool
+cargo run --release -- --help
 ```
 
-## 🎯 How to Play
+## 📖 Usage
 
-### Objective
-Navigate from your starting position **@** to the exit **E** while collecting treasure and avoiding dangers!
+### Port Scanning (Cautious Mode)
 
-### Controls
-- **W** or **↑** - Move up
-- **A** or **←** - Move left  
-- **S** or **↓** - Move down
-- **D** or **→** - Move right
-- **Q** - Quit game
-
-### Legend
-- **@** (Green) - That's you!
-- **E** (Magenta) - Exit to victory
-- **$** (Yellow) - Treasure (collect for points!)
-- **M** (Red) - Enemy (fight them, but take damage)
-- **^** (Red) - Visible trap (avoid!)
-- **Space** - Could be safe... or a hidden trap!
-- **█** - Walls (impassable)
-
-### Strategy Tips
-
-1. **Move Carefully** - Some traps are invisible!
-2. **Watch for Warnings** - The caution system alerts you to nearby dangers
-3. **Collect Treasure** - More coins = higher score
-4. **Conserve Health** - Every hit counts
-5. **Plan Your Route** - The shortest path isn't always the safest
-
-## 📊 Scoring
-
-Your final score is calculated based on:
-- **Coins Collected** × 10
-- **Health Remaining**
-- **Movement Efficiency** (fewer moves = bonus points)
-
-Formula: `(Coins × 10) + Health + (1000 - Moves × 5)`
-
-## 🎬 Demo Mode
-
-Want to see the game in action first? Run the demo:
+Scan ports with rate limiting to avoid triggering IDS/IPS:
 
 ```bash
-npm run demo
+# Scan ports 1-100 with 100ms delay
+cargo run -- scan --target 192.168.1.1 --ports 1-100 --delay 100
+
+# Scan common ports with 500ms delay (more stealthy)
+cargo run -- scan -t example.com -p 1-1000 -d 500
 ```
 
-This shows an automated playthrough demonstrating all the game mechanics.
+**Key Features:**
+- Configurable delay between port probes
+- Progress indicators
+- Timeout handling
+- Open port detection
 
-## 🛠️ Technical Details
+### Defense Detection
 
-### Game Engine Features
+Detect defensive mechanisms before launching an assessment:
 
-- **Real-time Input Handling** - Immediate keypress response
-- **Collision Detection** - Smart boundary and object collision
-- **State Management** - Efficient game state tracking
-- **Procedural Generation** - Randomized trap, enemy, and treasure placement
-- **Proximity Detection** - Warning system for nearby dangers
-- **ANSI Color Support** - Beautiful colored terminal output
-
-### Architecture
-
-```javascript
-const CautiousEngine = require('./game.js');
-
-const game = new CautiousEngine();
-game.start();
+```bash
+# Check for WAF, IDS/IPS, rate limiting, etc.
+cargo run -- detect --target https://example.com
 ```
 
-The engine is modular and can be extended with:
-- Custom dungeon layouts
-- New enemy types
-- Additional items and power-ups
-- Boss battles
-- Multiple levels
+**Checks for:**
+- Web Application Firewalls (WAF)
+- Intrusion Detection/Prevention Systems (IDS/IPS)
+- Rate limiting mechanisms
+- Honeypot indicators
+- CAPTCHA protection
 
-## 🎨 Screenshots
+### Rate Limit Testing
 
-```
-╔═══════════════════════════════════════════════════════════╗
-║         🏰 CAUTIOUS ENGINE - DUNGEON CRAWLER 🏰          ║
-║              One wrong step could be your last!           ║
-╚═══════════════════════════════════════════════════════════╝
+Test how a target responds to repeated requests:
 
-HP: ████████████████ 80  Coins: 45  Moves: 23
+```bash
+# Send 10 requests with 1 second delay
+cargo run -- rate-test --url https://api.example.com/endpoint --count 10 --delay 1000
 
-██████████████████████████████████████████████████
-█                                                █
-█  @        $                    M               █
-█              ^                                 █
-█                                                █
-█        M                  $                    █
-█                    ^                           █
-█                              M                 █
-█           $                                    █
-█                                                █
-█                       $                        █
-█                                            E   █
-█                                                █
-██████████████████████████████████████████████████
-
-Legend: @ = You  E = Exit  $ = Treasure  M = Enemy  ^ = Trap
-
-⚠ CAUTION: Trap detected nearby!
-⚠ CAUTION: Enemy nearby!
-
-Controls: W/A/S/D to move  Q to quit
+# Aggressive test (use with caution!)
+cargo run -- rate-test -u https://example.com -c 50 -d 100
 ```
 
-## 🏅 Example Game Session
+**Monitors:**
+- Success/failure rates
+- Blocking patterns
+- Response time variations
+- Rate limit thresholds
+
+### Security Best Practices Guide
+
+Display built-in security guidance:
+
+```bash
+cargo run -- guide
+```
+
+**Covers:**
+- Authorization requirements
+- Rate limiting strategies
+- Stealth techniques
+- Defensive awareness
+- Responsible disclosure
+
+## 🎬 Example Session
+
+```bash
+$ cargo run -- scan -t scanme.nmap.org -p 1-100 -d 100
+
+╔══════════════════════════════════════════════════════════╗
+║        🛡️  CAUTIOUS ENGINE - DEFENSIVE TOOLKIT  🛡️       ║
+║          For Ethical Hackers & Pen Testers              ║
+╚══════════════════════════════════════════════════════════╝
+
+🔍 Starting Cautious Port Scan...
+Target: scanme.nmap.org
+Delay: 100ms (stealth mode)
+
+  ✓ Port 22 is OPEN
+  ✓ Port 80 is OPEN
+..........
+
+════════════════════════════════════════════════════════════
+Scan Complete
+════════════════════════════════════════════════════════════
+Open ports found: 2
+Time elapsed: 10.45s
+
+Open ports: [22, 80]
+
+⚠️  Remember: Always get proper authorization before scanning!
+```
+
+## 🛠️ Command Reference
+
+### Scan Command
+```bash
+cargo run -- scan [OPTIONS]
+
+OPTIONS:
+  -t, --target <TARGET>    Target IP address or hostname
+  -p, --ports <PORTS>      Port range to scan [default: 1-100]
+  -d, --delay <DELAY>      Delay between requests in ms [default: 100]
+```
+
+### Detect Command
+```bash
+cargo run -- detect [OPTIONS]
+
+OPTIONS:
+  -t, --target <TARGET>    Target URL or IP
+```
+
+### Rate Test Command
+```bash
+cargo run -- rate-test [OPTIONS]
+
+OPTIONS:
+  -u, --url <URL>          Target URL
+  -c, --count <COUNT>      Number of requests [default: 10]
+  -d, --delay <DELAY>      Delay between requests in ms [default: 1000]
+```
+
+### Guide Command
+```bash
+cargo run -- guide
+```
+
+## 🔒 Security & Ethics
+
+### ⚠️ Legal Notice
+
+**IMPORTANT:** This tool is for **authorized security testing only**.
+
+- ✅ **DO**: Obtain written permission before testing
+- ✅ **DO**: Define clear scope with stakeholders  
+- ✅ **DO**: Follow responsible disclosure practices
+- ❌ **DON'T**: Use on systems without authorization
+- ❌ **DON'T**: Cause damage or disruption
+- ❌ **DON'T**: Access data you're not authorized to see
+
+### Responsible Use
+
+The Cautious Engine is designed to help security professionals:
+
+1. **Avoid Detection** - Use delays and rate limiting
+2. **Minimize Impact** - Reduce load on target systems
+3. **Detect Defenses** - Identify security mechanisms before testing
+4. **Follow Best Practices** - Built-in guidance for ethical hacking
+
+### Compliance
+
+Users are responsible for:
+- Obtaining proper authorization
+- Complying with local laws and regulations
+- Following organizational policies
+- Adhering to rules of engagement
+
+## 🏗️ Architecture
+
+### Technology Stack
+
+- **Language**: Rust 2021 edition
+- **CLI Framework**: clap 4.5 (command-line parsing)
+- **Async Runtime**: tokio 1.42 (for future async features)
+- **Networking**: std::net (built-in TCP)
+- **Formatting**: colored 2.1 (terminal colors)
+
+### Project Structure
 
 ```
-Starting position: (2, 2)
-Move right → Found treasure! +25 coins
-Move down → ⚠ CAUTION: Trap detected nearby!
-Move right → All clear!
-Move down → 💥 OUCH! Stepped on trap! -20 HP
-Move right → ⚔️ Fought an enemy! -15 HP
-Continue to exit...
-🎉 VICTORY! Final Score: 1,285
+cautious-engine/
+├── src/
+│   └── main.rs           # Main application logic
+├── Cargo.toml            # Rust dependencies and metadata
+├── README.md             # This file
+└── .gitignore            # Git ignore patterns
 ```
 
-## 🤝 Extending the Game
+## 🧪 Testing
 
-The Cautious Engine is designed to be hackable! Here are some ideas:
+Run the built-in functionality:
 
-- Add new enemy types with different behaviors
-- Create themed dungeons (ice, fire, forest)
-- Implement power-ups and healing items
-- Add boss fights
-- Create a level progression system
-- Build a high score leaderboard
-- Add sound effects (terminal beeps!)
+```bash
+# Test the guide display
+cargo run -- guide
 
-## 📝 License
+# Test detection (safe - just displays detection logic)
+cargo run -- detect -t example.com
 
-MIT - Feel free to use, modify, and distribute!
+# Build and run tests
+cargo test
+```
 
-## 🎮 Pro Tips
+## 🚧 Roadmap
 
-- **Patience is key** - Rushing leads to death!
-- **Map as you go** - Remember dangerous areas
-- **Risk vs Reward** - Is that treasure worth the nearby trap?
-- **Health management** - Know when to avoid fights
-- **Corner strategy** - Enemies often patrol edges
+Future enhancements planned:
+
+- [ ] Actual HTTP request functionality (currently simulated)
+- [ ] Real WAF/IDS detection signatures
+- [ ] Proxy support for anonymity
+- [ ] Request/response logging
+- [ ] Custom payload support
+- [ ] Multi-threaded scanning (with rate limits)
+- [ ] Export results to JSON/CSV
+- [ ] Plugin architecture for custom checks
+
+## 🤝 Contributing
+
+Contributions are welcome! This is a defensive tool for ethical hacking - please ensure any contributions:
+
+- Follow responsible disclosure practices
+- Include appropriate warnings
+- Don't include exploits or malicious code
+- Maintain the "cautious" philosophy
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+## 🙏 Acknowledgments
+
+This tool is inspired by the need for more responsible and cautious security testing practices. It's designed to help security professionals avoid common pitfalls like:
+
+- Triggering IDS/IPS systems
+- Overwhelming target systems
+- Getting blocked by rate limiters
+- Operating without proper authorization
 
 ---
 
-**Remember: In the Cautious Engine, caution isn't cowardice—it's survival!** 🛡️
+**Remember: Being cautious isn't about being slow - it's about being smart, responsible, and professional.** 🛡️
 
-Ready to test your skills? `npm start` and enter the dungeon! 🏰
+*For educational and authorized security testing purposes only.*

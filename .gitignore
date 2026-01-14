@@ -1,10 +1,28 @@
+# Rust
+target/
+Cargo.lock
+
+# Node.js (if any)
 node_modules/
 *.log
+
+# OS files
 .DS_Store
-coverage/
+.vscode/
+.idea/
+
+# Environment
 .env
+*.swp
+*.swo
+*~
+
+# Build artifacts
 dist/
 build/
 tmp/
-.vscode/
-.idea/
+
+
+# Added by cargo
+
+/target
