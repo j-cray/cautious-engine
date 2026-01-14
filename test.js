@@ -1,10 +1,13 @@
+#!/usr/bin/env node
+
 /**
- * Tests for Cautious Engine
+ * Automated tests for Cautious Engine game mechanics
  */
 
-const cautiousEngine = require('./index.js');
+const CautiousEngine = require('./game.js');
 
-// Track test results
+console.log('🧪 Testing Cautious Engine...\n');
+
 let passed = 0;
 let failed = 0;
 
@@ -26,142 +29,135 @@ function assert(condition, message) {
   }
 }
 
-// String validation tests
-test('validateString accepts valid strings', () => {
-  const result = cautiousEngine.validateString('Hello World');
-  assert(result.valid === true, 'Should be valid');
-  assert(result.errors.length === 0, 'Should have no errors');
+// Test 1: Game initialization
+test('Game initializes with correct starting state', () => {
+  const game = new CautiousEngine();
+  assert(game.player.health === 100, 'Player should start with 100 health');
+  assert(game.player.coins === 0, 'Player should start with 0 coins');
+  assert(game.player.moves === 0, 'Player should start with 0 moves');
+  assert(game.gameOver === false, 'Game should not be over at start');
 });
 
-test('validateString rejects non-strings', () => {
-  const result = cautiousEngine.validateString(123);
-  assert(result.valid === false, 'Should be invalid');
-  assert(result.errors.length > 0, 'Should have errors');
+// Test 2: Player movement
+test('Player can move within boundaries', () => {
+  const game = new CautiousEngine();
+  const initialX = game.player.x;
+  const initialY = game.player.y;
+  
+  game.move(1, 0); // Move right
+  assert(game.player.x === initialX + 1, 'Player should move right');
+  assert(game.player.moves === 1, 'Move counter should increment');
 });
 
-test('validateString rejects empty strings by default', () => {
-  const result = cautiousEngine.validateString('');
-  assert(result.valid === false, 'Should be invalid');
+// Test 3: Boundary checking
+test('Player cannot move through walls', () => {
+  const game = new CautiousEngine();
+  game.player.x = 1;
+  game.player.y = 1;
+  
+  game.move(-1, 0); // Try to move into left wall
+  assert(game.player.x === 1, 'Player should not move through wall');
+  assert(game.warnings.length > 0, 'Should warn about wall collision');
 });
 
-test('validateString accepts empty strings when allowed', () => {
-  const result = cautiousEngine.validateString('', { allowEmpty: true });
-  assert(result.valid === true, 'Should be valid');
+// Test 4: Trap collision
+test('Stepping on trap reduces health', () => {
+  const game = new CautiousEngine();
+  const trap = { x: 10, y: 10, damage: 20, visible: true };
+  game.traps = [trap];
+  game.player.x = 9;
+  game.player.y = 10;
+  
+  const initialHealth = game.player.health;
+  game.move(1, 0); // Move onto trap
+  
+  assert(game.player.health < initialHealth, 'Health should decrease');
+  assert(game.traps.length === 0, 'Trap should be removed after triggering');
 });
 
-test('validateString rejects strings with null bytes', () => {
-  const result = cautiousEngine.validateString('Hello\0World');
-  assert(result.valid === false, 'Should be invalid');
+// Test 5: Treasure collection
+test('Collecting treasure increases coins', () => {
+  const game = new CautiousEngine();
+  const treasure = { x: 10, y: 10, value: 50 };
+  game.treasures = [treasure];
+  game.player.x = 9;
+  game.player.y = 10;
+  
+  game.move(1, 0); // Move onto treasure
+  
+  assert(game.player.coins === 50, 'Coins should increase by treasure value');
+  assert(game.treasures.length === 0, 'Treasure should be removed after collection');
 });
 
-test('validateString rejects strings exceeding maxLength', () => {
-  const result = cautiousEngine.validateString('x'.repeat(100), { maxLength: 50 });
-  assert(result.valid === false, 'Should be invalid');
+// Test 6: Enemy encounter
+test('Fighting enemy reduces health', () => {
+  const game = new CautiousEngine();
+  const enemy = { x: 10, y: 10, damage: 15, alive: true };
+  game.enemies = [enemy];
+  game.player.x = 9;
+  game.player.y = 10;
+  
+  const initialHealth = game.player.health;
+  game.move(1, 0); // Move onto enemy
+  
+  assert(game.player.health === initialHealth - 15, 'Health should decrease by enemy damage');
+  assert(enemy.alive === false, 'Enemy should be defeated');
 });
 
-// Number validation tests
-test('validateNumber accepts valid numbers', () => {
-  const result = cautiousEngine.validateNumber(42);
-  assert(result.valid === true, 'Should be valid');
+// Test 7: Danger detection
+test('Caution system detects nearby dangers', () => {
+  const game = new CautiousEngine();
+  game.traps = [{ x: 5, y: 5, damage: 20, visible: true }];
+  
+  const warnings = game.checkDanger(5, 6); // Check position near trap
+  assert(warnings.length > 0, 'Should warn about nearby trap');
 });
 
-test('validateNumber rejects NaN', () => {
-  const result = cautiousEngine.validateNumber(NaN);
-  assert(result.valid === false, 'Should be invalid');
+// Test 8: Victory condition
+test('Reaching exit triggers victory', () => {
+  const game = new CautiousEngine();
+  game.player.x = game.exit.x - 1;
+  game.player.y = game.exit.y;
+  
+  game.move(1, 0); // Move to exit
+  
+  assert(game.won === true, 'Game should be won');
+  assert(game.gameOver === true, 'Game should be over');
 });
 
-test('validateNumber rejects non-numbers', () => {
-  const result = cautiousEngine.validateNumber('42');
-  assert(result.valid === false, 'Should be invalid');
+// Test 9: Death condition
+test('Health reaching zero triggers game over', () => {
+  const game = new CautiousEngine();
+  game.player.health = 10;
+  game.traps = [{ x: 5, y: 5, damage: 20, visible: true }];
+  game.player.x = 4;
+  game.player.y = 5;
+  
+  game.move(1, 0); // Step on trap that kills player
+  
+  assert(game.player.health <= 0, 'Health should be zero or negative');
+  assert(game.gameOver === true, 'Game should be over');
+  assert(game.won === false, 'Player should not have won');
 });
 
-test('validateNumber checks min/max bounds', () => {
-  const result = cautiousEngine.validateNumber(150, { min: 0, max: 100 });
-  assert(result.valid === false, 'Should be invalid');
-});
-
-// HTML sanitization tests
-test('sanitizeHTML escapes HTML entities', () => {
-  const result = cautiousEngine.sanitizeHTML('<script>alert("xss")</script>');
-  assert(!result.includes('<script>'), 'Should escape script tags');
-  assert(result.includes('&lt;'), 'Should contain escaped brackets');
-});
-
-test('sanitizeHTML handles non-strings', () => {
-  const result = cautiousEngine.sanitizeHTML(null);
-  assert(result === '', 'Should return empty string');
-});
-
-// Email validation tests
-test('validateEmail accepts valid emails', () => {
-  const result = cautiousEngine.validateEmail('user@example.com');
-  assert(result.valid === true, 'Should be valid');
-});
-
-test('validateEmail rejects invalid emails', () => {
-  const result = cautiousEngine.validateEmail('not-an-email');
-  assert(result.valid === false, 'Should be invalid');
-});
-
-test('validateEmail rejects non-strings', () => {
-  const result = cautiousEngine.validateEmail(null);
-  assert(result.valid === false, 'Should be invalid');
-});
-
-// URL validation tests
-test('validateURL accepts valid URLs', () => {
-  const result = cautiousEngine.validateURL('https://example.com');
-  assert(result.valid === true, 'Should be valid');
-});
-
-test('validateURL rejects invalid URLs', () => {
-  const result = cautiousEngine.validateURL('not a url');
-  assert(result.valid === false, 'Should be invalid');
-});
-
-test('validateURL rejects disallowed protocols', () => {
-  const result = cautiousEngine.validateURL('javascript:alert(1)');
-  assert(result.valid === false, 'Should be invalid');
-});
-
-test('validateURL accepts custom protocols', () => {
-  const result = cautiousEngine.validateURL('ftp://example.com', { allowedProtocols: ['ftp:'] });
-  assert(result.valid === true, 'Should be valid with custom protocols');
-});
-
-// JSON parsing tests
-test('safeJSONParse handles valid JSON', () => {
-  const result = cautiousEngine.safeJSONParse('{"key": "value"}');
-  assert(result.success === true, 'Should succeed');
-  assert(result.data.key === 'value', 'Should parse correctly');
-});
-
-test('safeJSONParse handles invalid JSON', () => {
-  const result = cautiousEngine.safeJSONParse('{invalid}');
-  assert(result.success === false, 'Should fail');
-  assert(result.error !== null, 'Should have error message');
-});
-
-// Required properties tests
-test('validateRequiredProps accepts objects with all required props', () => {
-  const result = cautiousEngine.validateRequiredProps({ a: 1, b: 2 }, ['a', 'b']);
-  assert(result.valid === true, 'Should be valid');
-});
-
-test('validateRequiredProps rejects objects missing required props', () => {
-  const result = cautiousEngine.validateRequiredProps({ a: 1 }, ['a', 'b']);
-  assert(result.valid === false, 'Should be invalid');
-});
-
-test('validateRequiredProps rejects non-objects', () => {
-  const result = cautiousEngine.validateRequiredProps(null, ['a']);
-  assert(result.valid === false, 'Should be invalid');
+// Test 10: Procedural generation
+test('Game generates random elements', () => {
+  const game1 = new CautiousEngine();
+  const game2 = new CautiousEngine();
+  
+  // Very unlikely to have identical layouts
+  const sameTraps = JSON.stringify(game1.traps) === JSON.stringify(game2.traps);
+  assert(!sameTraps, 'Traps should be randomly generated');
 });
 
 // Print summary
-console.log('\n' + '='.repeat(50));
-console.log(`Tests passed: ${passed}`);
-console.log(`Tests failed: ${failed}`);
-console.log('='.repeat(50));
+console.log('\n' + '='.repeat(60));
+console.log(`✅ Tests passed: ${passed}`);
+console.log(`❌ Tests failed: ${failed}`);
+console.log('='.repeat(60));
+
+if (failed === 0) {
+  console.log('\n🎉 All tests passed! The Cautious Engine is ready to play!\n');
+}
 
 process.exit(failed > 0 ? 1 : 0);
