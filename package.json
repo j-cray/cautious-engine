@@ -1,0 +1,18 @@
+{
+  "name": "cautious-engine",
+  "version": "1.0.0",
+  "description": "A validation and safety-checking utility that helps you avoid common mistakes",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "validation",
+    "safety",
+    "sanitization",
+    "input-validation",
+    "security"
+  ],
+  "author": "",
+  "license": "MIT"
+}
