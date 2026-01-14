@@ -6,6 +6,7 @@ use std::thread;
 use std::io::{Read, Write};
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
+use base64::Engine;
 
 /// Cautious Engine - An advanced defensive security toolkit for ethical hackers
 #[derive(Parser)]
@@ -244,7 +245,7 @@ fn advanced_scan(target: &str, port_range: &str, delay_ms: u64, service_detect: 
                 results.push((port, service));
             } else if port % 100 == 0 {
                 print!(".");
-                std::io::stdout().flush().unwrap();
+                let _ = std::io::stdout().flush();
             }
         }
     }
@@ -727,7 +728,7 @@ fn generate_all_payloads() -> Vec<String> {
 fn encode_payload(payload: &str, encoding: &str) -> String {
     match encoding {
         "url" => urlencoding::encode(payload).to_string(),
-        "base64" => base64::Engine::encode(&base64::engine::general_purpose::STANDARD, payload),
+        "base64" => base64::engine::general_purpose::STANDARD.encode(payload),
         "hex" => hex::encode(payload),
         _ => payload.to_string(),
     }
@@ -868,17 +869,20 @@ fn show_guide() {
 // Simple URL encoding helper
 mod urlencoding {
     pub fn encode(s: &str) -> String {
-        s.chars()
-            .map(|c| match c {
-                'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' | '~' => c.to_string(),
-                ' ' => "+".to_string(),
-                _ => format!("%{:02X}", c as u8),
+        s.as_bytes()
+            .iter()
+            .map(|&b| match b {
+                b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                    (b as char).to_string()
+                }
+                b' ' => "+".to_string(),
+                _ => format!("%{:02X}", b),
             })
             .collect()
     }
 }
 
-// Add chrono for timestamps
+// Simple timestamp helper
 mod chrono {
     use std::time::{SystemTime, UNIX_EPOCH};
     
@@ -897,7 +901,21 @@ mod chrono {
             let now = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap();
-            format!("{}", now.as_secs())
+            let secs = now.as_secs();
+            
+            // Simple ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+            let days_since_epoch = secs / 86400;
+            let years = 1970 + days_since_epoch / 365;
+            let days_in_year = days_since_epoch % 365;
+            let months = days_in_year / 30;
+            let days = days_in_year % 30;
+            
+            let hours = (secs % 86400) / 3600;
+            let minutes = (secs % 3600) / 60;
+            let seconds = secs % 60;
+            
+            format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z", 
+                years, months + 1, days + 1, hours, minutes, seconds)
         }
     }
 }
