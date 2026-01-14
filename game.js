@@ -23,12 +23,43 @@ const colors = {
   bgGreen: '\x1b[42m'
 };
 
+// Game configuration constants
+const CONFIG = {
+  DUNGEON_WIDTH: 50,
+  DUNGEON_HEIGHT: 15,
+  PLAYER_START_HEALTH: 100,
+  PLAYER_START_X: 2,
+  PLAYER_START_Y: 2,
+  EXIT_X: 47,
+  EXIT_Y: 12,
+  TRAP_COUNT: 20,
+  TRAP_DAMAGE: 20,
+  TRAP_VISIBILITY_CHANCE: 0.5,
+  TREASURE_COUNT: 10,
+  TREASURE_MIN_VALUE: 10,
+  TREASURE_MAX_VALUE: 50,
+  ENEMY_COUNT: 8,
+  ENEMY_DAMAGE: 15,
+  SPAWN_MARGIN: 2,
+  CAUTION_TRAP_RANGE: 1,
+  CAUTION_ENEMY_RANGE: 2,
+  SCORE_COIN_MULTIPLIER: 10,
+  SCORE_BASE_BONUS: 1000,
+  SCORE_MOVE_PENALTY: 5
+};
+
 class CautiousEngine {
   constructor() {
-    this.width = 50;
-    this.height = 15;
-    this.player = { x: 2, y: 2, health: 100, coins: 0, moves: 0 };
-    this.exit = { x: 47, y: 12 };
+    this.width = CONFIG.DUNGEON_WIDTH;
+    this.height = CONFIG.DUNGEON_HEIGHT;
+    this.player = { 
+      x: CONFIG.PLAYER_START_X, 
+      y: CONFIG.PLAYER_START_Y, 
+      health: CONFIG.PLAYER_START_HEALTH, 
+      coins: 0, 
+      moves: 0 
+    };
+    this.exit = { x: CONFIG.EXIT_X, y: CONFIG.EXIT_Y };
     this.traps = this.generateTraps();
     this.treasures = this.generateTreasures();
     this.enemies = this.generateEnemies();
@@ -41,12 +72,12 @@ class CautiousEngine {
 
   generateTraps() {
     const traps = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < CONFIG.TRAP_COUNT; i++) {
       traps.push({
-        x: Math.floor(Math.random() * (this.width - 4)) + 2,
-        y: Math.floor(Math.random() * (this.height - 4)) + 2,
-        damage: 20,
-        visible: Math.random() > 0.5 // Some traps are hidden!
+        x: Math.floor(Math.random() * (this.width - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        y: Math.floor(Math.random() * (this.height - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        damage: CONFIG.TRAP_DAMAGE,
+        visible: Math.random() > CONFIG.TRAP_VISIBILITY_CHANCE // Some traps are hidden!
       });
     }
     return traps;
@@ -54,11 +85,11 @@ class CautiousEngine {
 
   generateTreasures() {
     const treasures = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < CONFIG.TREASURE_COUNT; i++) {
       treasures.push({
-        x: Math.floor(Math.random() * (this.width - 4)) + 2,
-        y: Math.floor(Math.random() * (this.height - 4)) + 2,
-        value: Math.floor(Math.random() * 50) + 10
+        x: Math.floor(Math.random() * (this.width - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        y: Math.floor(Math.random() * (this.height - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        value: Math.floor(Math.random() * (CONFIG.TREASURE_MAX_VALUE - CONFIG.TREASURE_MIN_VALUE)) + CONFIG.TREASURE_MIN_VALUE
       });
     }
     return treasures;
@@ -66,11 +97,11 @@ class CautiousEngine {
 
   generateEnemies() {
     const enemies = [];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < CONFIG.ENEMY_COUNT; i++) {
       enemies.push({
-        x: Math.floor(Math.random() * (this.width - 4)) + 2,
-        y: Math.floor(Math.random() * (this.height - 4)) + 2,
-        damage: 15,
+        x: Math.floor(Math.random() * (this.width - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        y: Math.floor(Math.random() * (this.height - CONFIG.SPAWN_MARGIN * 2)) + CONFIG.SPAWN_MARGIN,
+        damage: CONFIG.ENEMY_DAMAGE,
         alive: true
       });
     }
@@ -82,7 +113,7 @@ class CautiousEngine {
     
     // Check for traps nearby
     const nearbyTraps = this.traps.filter(t => 
-      Math.abs(t.x - x) <= 1 && Math.abs(t.y - y) <= 1
+      Math.abs(t.x - x) <= CONFIG.CAUTION_TRAP_RANGE && Math.abs(t.y - y) <= CONFIG.CAUTION_TRAP_RANGE
     );
     if (nearbyTraps.length > 0) {
       dangers.push(`${colors.yellow}⚠ CAUTION: Trap detected nearby!${colors.reset}`);
@@ -90,7 +121,7 @@ class CautiousEngine {
 
     // Check for enemies nearby
     const nearbyEnemies = this.enemies.filter(e => 
-      e.alive && Math.abs(e.x - x) <= 2 && Math.abs(e.y - y) <= 2
+      e.alive && Math.abs(e.x - x) <= CONFIG.CAUTION_ENEMY_RANGE && Math.abs(e.y - y) <= CONFIG.CAUTION_ENEMY_RANGE
     );
     if (nearbyEnemies.length > 0) {
       dangers.push(`${colors.red}⚠ CAUTION: Enemy nearby!${colors.reset}`);
@@ -292,6 +323,9 @@ class CautiousEngine {
   showEndScreen() {
     console.log('\n' + '='.repeat(60));
     if (this.won) {
+      const totalScore = this.player.coins * CONFIG.SCORE_COIN_MULTIPLIER + 
+                        this.player.health + 
+                        (CONFIG.SCORE_BASE_BONUS - this.player.moves * CONFIG.SCORE_MOVE_PENALTY);
       console.log(`${colors.green}${colors.bright}
 🎉 VICTORY! 🎉
 You cautiously navigated the dungeon and escaped!
@@ -300,7 +334,7 @@ Final Score:
   Coins Collected: ${this.player.coins}
   Health Remaining: ${this.player.health}
   Moves Taken: ${this.player.moves}
-  Total Score: ${this.player.coins * 10 + this.player.health + (1000 - this.player.moves * 5)}
+  Total Score: ${totalScore}
 
 You are a true master of caution!
 ${colors.reset}`);
