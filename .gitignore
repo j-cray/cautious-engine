@@ -6,6 +6,14 @@ Cargo.lock
 node_modules/
 *.log
 
+# Defense stack generated files
+security.log
+test_security.log
+blocked.json
+defense_config.json
+audit_report.json
+*.json
+
 # OS files
 .DS_Store
 .vscode/
