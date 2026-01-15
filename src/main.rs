@@ -5,6 +5,7 @@ use std::thread;
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use chrono::Local;
 
 /// Cautious Engine - An automated cybersec/opsec defense stack
 #[derive(Parser)]
@@ -354,12 +355,12 @@ fn analyze_security_logs(log_file: &str, window_minutes: u64) {
     
     println!("{}", "Severity Breakdown:".yellow().bold());
     for (severity, count) in severity_counts.iter() {
-        let color = match severity.as_str() {
-            "HIGH" => "red",
-            "MEDIUM" => "yellow",
-            _ => "green",
+        let severity_colored = match severity.as_str() {
+            "HIGH" => severity.red(),
+            "MEDIUM" => severity.yellow(),
+            _ => severity.green(),
         };
-        println!("  {} {}", severity.color(color), format!("({})", count).dimmed());
+        println!("  {} {}", severity_colored, format!("({})", count).dimmed());
     }
     
     // Top attacking IPs
@@ -467,7 +468,7 @@ fn show_dashboard(interval: u64) {
         // Clear screen simulation
         println!("{}", "════════════════════════════════════════════════════════════".cyan());
         println!("{} {}", "🛡️  Defense Status".bright_cyan().bold(), 
-            chrono::Local::now().format("%H:%M:%S").to_string().dimmed());
+            Local::now().format("%H:%M:%S").to_string().dimmed());
         println!("{}", "════════════════════════════════════════════════════════════".cyan());
         println!();
         
@@ -636,12 +637,12 @@ fn generate_security_report(report_type: &str, period_hours: u64, output: Option
     
     println!("{}", "Severity Levels:".yellow().bold());
     for (severity, count) in &report.severity_breakdown {
-        let color = match severity.as_str() {
-            "HIGH" => "red",
-            "MEDIUM" => "yellow",
-            _ => "green",
+        let severity_colored = match severity.as_str() {
+            "HIGH" => severity.red(),
+            "MEDIUM" => severity.yellow(),
+            _ => severity.green(),
         };
-        println!("  {} {}", severity.color(color), format!("({})", count).dimmed());
+        println!("  {} {}", severity_colored, format!("({})", count).dimmed());
     }
     
     // Save report
