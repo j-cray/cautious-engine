@@ -13,6 +13,7 @@ blocked.json
 defense_config.json
 audit_report.json
 *.json
+*.pid
 
 # OS files
 .DS_Store
