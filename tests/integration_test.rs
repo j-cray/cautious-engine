@@ -32,6 +32,8 @@ mod tests {
         assert!(stdout.contains("monitor"));
         assert!(stdout.contains("analyze"));
         assert!(stdout.contains("block"));
+        assert!(stdout.contains("daemon"));
+        assert!(stdout.contains("ai-analyze"));
     }
     
     #[test]
@@ -78,5 +80,34 @@ mod tests {
         
         // Clean up
         std::fs::remove_file("test_monitor.log").ok();
+    }
+    
+    #[test]
+    fn test_ai_analyze_command() {
+        // Test AI analysis command
+        let output = Command::new("cargo")
+            .args(&["run", "--", "ai-analyze", "--log", "nonexistent.log"])
+            .output()
+            .expect("Failed to run ai-analyze");
+        
+        assert!(output.status.success());
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("AI-Powered Threat Analysis"));
+        assert!(stdout.contains("Anomaly Detection"));
+        assert!(stdout.contains("Threat Prediction"));
+    }
+    
+    #[test]
+    fn test_daemon_help() {
+        // Test daemon command help
+        let output = Command::new("cargo")
+            .args(&["run", "--", "daemon", "--help"])
+            .output()
+            .expect("Failed to run daemon help");
+        
+        assert!(output.status.success());
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        assert!(stdout.contains("background service"));
+        assert!(stdout.contains("automated"));
     }
 }
