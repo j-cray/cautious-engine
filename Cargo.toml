@@ -9,8 +9,7 @@ license = "MIT"
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
 colored = "2.1"
-reqwest = { version = "0.12", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-base64 = "0.22"
-hex = "0.4"
+chrono = { version = "0.4", features = ["clock"] }
+signal-hook = "0.3"  # Cross-platform signal handling for daemon mode
